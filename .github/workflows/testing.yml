@@ -41,3 +41,7 @@ jobs:
       - name: test
 
         run: npm test
+
+      - name: Test and coverage
+
+        run: npm run cover
