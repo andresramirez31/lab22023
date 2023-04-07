@@ -2,39 +2,42 @@ name: Unit Tests
 
  
 
-on: [pull_request]
+on: 
+  workflow_dispatch:
+
+    push:
+
+       branches:
+
+        - mi-rama
+
+    pull_request:
+
+       types: [opened, synchronize, reopened]
 
  
 
 jobs:
 
-  test:
-
-    runs-on: ubuntu-latest
-
- 
-
-    strategy:
-
-      matrix:
-
-        node-version: [18.x, 16.x]
-
+  sonarcloud:
     
-
+    name: sonarcloud
+    
+    runs-on: ubuntu-latest
+    
     steps:
 
       - uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node.version }}
-
-        uses: actions/setup-node@v1
-
         with:
 
-          node-version: ${{ matrix.node-version }}
+          fetch-depth: 0      
 
-      - name: npm install
+      - name: install dependencies
+
+        run: npm install
+
+      - name: npm ci  
 
         run: npm ci 
 
@@ -45,3 +48,13 @@ jobs:
       - name: Test and coverage
 
         run: npm run cover
+
+      - name: SonarCloud Scan
+
+        uses: SonarSource/sonarcloud-github-action@master
+
+        env:
+
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
